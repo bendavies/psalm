@@ -257,9 +257,10 @@ class Scanner
         string $fq_classlike_name,
         bool $analyze_too = false,
         bool $store_failure = true,
-        array $phantom_classes = []
+        array $phantom_classes = [],
+        bool $is_stub = false
     ): void {
-        if ($this->codebase->register_stub_files) {
+        if ($is_stub && $this->codebase->register_stub_files) {
             $this->classes_to_scan_deferred[] = func_get_args();
             return;
         }

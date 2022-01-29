@@ -1955,9 +1955,16 @@ class Codebase
         string $fq_classlike_name,
         bool $analyze_too = false,
         bool $store_failure = true,
-        array $phantom_classes = []
+        array $phantom_classes = [],
+        bool $is_stub = false
     ): void {
-        $this->scanner->queueClassLikeForScanning($fq_classlike_name, $analyze_too, $store_failure, $phantom_classes);
+        $this->scanner->queueClassLikeForScanning(
+            $fq_classlike_name,
+            $analyze_too,
+            $store_failure,
+            $phantom_classes,
+            $is_stub
+        );
     }
 
     /**

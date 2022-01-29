@@ -517,6 +517,10 @@ class Codebase
     {
         $has_changes = $this->scanner->scanFiles($this->classlikes, $threads);
 
+        if ($this->register_stub_files) {
+            $this->scanner->queueClassesToScanDeferred();
+        }
+
         if ($has_changes) {
             $this->populator->populateCodebase();
         }

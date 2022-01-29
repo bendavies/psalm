@@ -25,11 +25,13 @@ use UnexpectedValueException;
 use function array_filter;
 use function array_merge;
 use function array_pop;
+use function call_user_func_array;
 use function ceil;
 use function count;
 use function error_reporting;
 use function explode;
 use function file_exists;
+use function func_get_args;
 use function min;
 use function realpath;
 use function strtolower;
@@ -113,6 +115,11 @@ class Scanner
      * @var array<string, bool>
      */
     private $classes_to_deep_scan = [];
+
+    /**
+     * @var array<mixed>
+     */
+    private $classes_to_scan_deferred = [];
 
     /**
      * @var array<string, string>
@@ -252,6 +259,11 @@ class Scanner
         bool $store_failure = true,
         array $phantom_classes = []
     ): void {
+        if ($this->codebase->register_stub_files) {
+            $this->classes_to_scan_deferred[] = func_get_args();
+            return;
+        }
+
         if ($fq_classlike_name[0] === '\\') {
             $fq_classlike_name = substr($fq_classlike_name, 1);
         }
@@ -309,6 +321,14 @@ class Scanner
         }
 
         return $has_changes;
+    }
+
+    public function queueClassesToScanDeferred(): void
+    {
+        foreach ($this->classes_to_scan_deferred as $deferred) {
+            call_user_func_array([$this, 'queueClassLikeForScanning'], $deferred);
+        }
+        $this->classes_to_scan_deferred = [];
     }
 
     private function scanFilePaths(int $pool_size): bool
